@@ -71,6 +71,17 @@ live coding them requires that you have your SuperDirt instance in an environmen
 		ReplaceOut.ar(in, Silent.ar(numChannels)) // clears bus signal for subsequent synths
 	}, [\ir, \ir, \ir, \ir, \ir, \ir]).add;
 
+	// need to find a way to not hardcode this!
+	(0..(8-3)).do { |fxindex|
+		SynthDef("dirt_gate_fx" ++ fxindex ++ numChannels, { |out, in, fxBus, send,
+			sustain = 1, fadeInTime = 0.001, fadeTime = 0.001, amp = 1|
+			var signal = In.ar(in, numChannels);
+			var env = EnvGen.ar(Env([0, 1, 1, 0], [fadeInTime, sustain, fadeTime], \sin), levelScale: amp, doneAction: 2);
+			signal = signal * env * DirtGateCutGroup.ar(fadeTime, doneAction: 2);
+			OffsetOut.ar(fxBus + (numChannels * fxindex), send*signal);
+		}, [\ir, \ir, \ir, \ir, \ir, \ir]).add;
+	};
+
 
 	/*
 
