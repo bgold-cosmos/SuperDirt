@@ -25,8 +25,9 @@ DirtOrbit {
 
 	var <dirt,  <outBus, <orbitIndex;
 	var <server;
-	var <synthBus, <globalEffectBus, <dryBus;
+	var <synthBus, <globalEffectBus, <dryBus, <fxBus;
 	var <group, <globalEffects, <cutGroups;
+	var <sendpars;
 	var <>minSustain;
 
 
@@ -49,6 +50,7 @@ DirtOrbit {
 		globalEffectBus = Bus.audio(server, dirt.numChannels);
 		minSustain = 8 / server.sampleRate;
 		this.initDefaultGlobalEffects;
+		fxBus = Bus.audio(server, dirt.numChannels * (this.globalEffects.size - 2));
 		this.initNodeTree;
 		this.makeDefaultParentEvent;
 
@@ -59,13 +61,16 @@ DirtOrbit {
 	initDefaultGlobalEffects {
 		this.globalEffects = [
 			// all global effects sleep when the input is quiet for long enough and no parameters are set.
-			GlobalDirtEffect(\dirt_delay, [\delaytime, \delayfeedback, \delaySend, \delayAmp, \lock, \cps]),
-			GlobalDirtEffect(\dirt_reverb, [\size, \room, \dry]),
-			GlobalDirtEffect(\dirt_leslie, [\leslie, \lrate, \lsize]),
-			GlobalDirtEffect(\dirt_rms, [\rmsReplyRate, \rmsPeakLag]).alwaysRun_(true),
-			GlobalDirtEffect(\dirt_monitor).alwaysRun_(true),
-
-		]
+			GlobalDirtEffect(\dirt_delay, [\delaytime, \delayfeedback, \lock, \cps], 2, 0*dirt.numChannels),
+			GlobalDirtEffect(\dirt_reverb, [\size], dirt.numChannels, 1*dirt.numChannels),
+			GlobalDirtEffect(\dirt_leslie, [\lrate, \lsize], dirt.numChannels, 2*dirt.numChannels),
+			GlobalDirtEffect(\dirt_tape, [\tapefb, \taped, \tapec], dirt.numChannels, 3*dirt.numChannels),
+			GlobalDirtEffect(\dirt_hall, [\hallfb, \hallcutoff, \halltail, \hallpredelay, \halldelay, \halldelayt, \halldelayfb, \hallshift], dirt.numChannels, 4*dirt.numChannels),
+			GlobalDirtEffect(\dirt_ambient, [\amb, \ambfreq, \ambfb, \amblpf, \ambvoice, \ambwidth], dirt.numChannels, 5*dirt.numChannels),
+			GlobalDirtEffect(\dirt_rms, [\rmsReplyRate, \rmsPeakLag], dirt.numChannels, 0).alwaysRun_(true),
+			GlobalDirtEffect(\dirt_monitor, [], dirt.numChannels, 0).alwaysRun_(true),
+		];
+		sendpars = [\delay, \room, \leslie, \tape, \hall, \ambsend];
 	}
 
 	globalEffects_ { |array|
@@ -85,7 +90,7 @@ DirtOrbit {
 		server.makeBundle(nil, { // make sure they are in order
 			server.sendMsg("/g_new", group, 0, 1); // make sure group exists
 			globalEffects.reverseDo { |x|
-				x.play(group, outBus, dryBus, globalEffectBus, orbitIndex)
+				x.play(group, outBus, dryBus, globalEffectBus, fxBus, orbitIndex)
 			}
 		})
 	}
@@ -194,7 +199,7 @@ DirtOrbit {
 			~lag = 0.0;
 			~length = 1.0;
 			~loop = 1.0;
-			~dry = 0.0;
+			~dry = 1.0;
 			~lock = 0; // if set to 1, syncs delay times with cps
 
 			~amp = 0.4;
@@ -207,6 +212,7 @@ DirtOrbit {
 			~out = synthBus;
 			~dryBus = dryBus;
 			~effectBus = globalEffectBus;
+			~fxBus = fxBus;
 			~numChannels = dirt.numChannels;
 			~server = server;
 
