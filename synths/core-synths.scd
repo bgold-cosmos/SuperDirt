@@ -62,12 +62,13 @@ live coding them requires that you have your SuperDirt instance in an environmen
 	// the monitor does the mixing and zeroing of the busses for each sample grain
 	// so that they can all play in one bus
 
-	SynthDef("dirt_gate" ++ numChannels, { |out, in, sustain = 1, fadeInTime = 0.001, fadeTime = 0.001, amp = 1|
+	SynthDef("dirt_gate" ++ numChannels, { |out, in, dry,
+		sustain = 1, fadeInTime = 0.001, fadeTime = 0.001, amp = 1|
 		var signal = In.ar(in, numChannels);
 		 //  doneAction: 14: free surrounding group and all nodes
 		var env = EnvGen.ar(Env([0, 1, 1, 0], [fadeInTime, sustain, fadeTime], \sin), levelScale: amp, doneAction: 14);
 		signal = signal * env * DirtGateCutGroup.ar(fadeTime, doneAction: 14);
-		OffsetOut.ar(out, signal);
+		OffsetOut.ar(out, dry*signal);
 		ReplaceOut.ar(in, Silent.ar(numChannels)) // clears bus signal for subsequent synths
 	}, [\ir, \ir, \ir, \ir, \ir, \ir]).add;
 
