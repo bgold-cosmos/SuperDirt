@@ -265,27 +265,27 @@ CORE SYNTHDEFS FOR DIRT
 	// 	Out.ar(effectBus, snd);
 	// }, [\ir, \ir]).add;
 
-	SynthDef("dirt_ambient" ++ numChannels, { |fxBus, effectBus, gate = 1,
-		amb = 0.0, ambfreq=220.0, amblpf=3500, ambfb=0.0, ambwidth=0.5, ambvoice=0.0 |
-		var in = In.ar(fxBus, numChannels);
-		var again = (amb.lag(2.3)**4 * 0.7 * 0.3);
-		var afreq = ambfreq.lag(1.1);
-		// var fmult = Array.fill(50, {Rand(-1,1)});
-		var fmult = LFNoise2.ar(ambvoice.lag(1).linexp(0,2,0.01,100) ! 50);
-		var snd;
-		fmult = 2.0 ** (fmult * ambwidth.lag(1).linexp(0,2,0.01,100));
-		snd = again * Splay.ar( SinOsc.ar(afreq * fmult) + SinOsc.ar(afreq * 2.0 * fmult, mul:0.2) + SinOsc.ar(afreq * 3.0 * fmult, mul:0.5), 0.4);
-		// snd = (sin(pi/2 * (1.0 - ambvoice)) * snd) + (sin(pi/2 * ambvoice) * CompanderD.ar(snd, 0.1, 1.0, 2.0, 1e-4, 1e-4));
-		snd = snd + in + (ambfb.lag(1) * LocalIn.ar(2));
-		snd = LPF.ar(snd, amblpf.lag(3));
-		snd = AllpassN.ar(snd, 0.02, 0.005 + LFNoise2.kr([0.1,0.101], mul:0.001), 0.1);
-		// snd = CombN.ar(snd, 0.1, [0.05, 0.051], [0.5, 0.45]);
-		snd = DelayN.ar(snd, 0.01, LFNoise2.ar(0.1, 0.001, 0.002));
-		// snd = Disintegrator.ar(snd, 0.01, 0.0);
-		snd = Compander.ar(snd, snd, -3.dbamp, 1.0, 0.1, 0.030, 0.450);
-		LocalOut.ar(snd);
-		Out.ar(effectBus, snd);
-	}, [\ir, \ir]).add;
+	// SynthDef("dirt_ambient" ++ numChannels, { |fxBus, effectBus, gate = 1,
+	// 	amb = 0.0, ambfreq=220.0, amblpf=3500, ambfb=0.0, ambwidth=0.5, ambvoice=0.0 |
+	// 	var in = In.ar(fxBus, numChannels);
+	// 	var again = (amb.lag(2.3)**4 * 0.7 * 0.3);
+	// 	var afreq = ambfreq.lag(1.1);
+	// 	// var fmult = Array.fill(50, {Rand(-1,1)});
+	// 	var fmult = LFNoise2.ar(ambvoice.lag(1).linexp(0,2,0.01,100) ! 50);
+	// 	var snd;
+	// 	fmult = 2.0 ** (fmult * ambwidth.lag(1).linexp(0,2,0.01,100));
+	// 	snd = again * Splay.ar( SinOsc.ar(afreq * fmult) + SinOsc.ar(afreq * 2.0 * fmult, mul:0.2) + SinOsc.ar(afreq * 3.0 * fmult, mul:0.5), 0.4);
+	// 	// snd = (sin(pi/2 * (1.0 - ambvoice)) * snd) + (sin(pi/2 * ambvoice) * CompanderD.ar(snd, 0.1, 1.0, 2.0, 1e-4, 1e-4));
+	// 	snd = snd + in + (ambfb.lag(1) * LocalIn.ar(2));
+	// 	snd = LPF.ar(snd, amblpf.lag(3));
+	// 	snd = AllpassN.ar(snd, 0.02, 0.005 + LFNoise2.kr([0.1,0.101], mul:0.001), 0.1);
+	// 	// snd = CombN.ar(snd, 0.1, [0.05, 0.051], [0.5, 0.45]);
+	// 	snd = DelayN.ar(snd, 0.01, LFNoise2.ar(0.1, 0.001, 0.002));
+	// 	// snd = Disintegrator.ar(snd, 0.01, 0.0);
+	// 	snd = Compander.ar(snd, snd, -3.dbamp, 1.0, 0.1, 0.030, 0.450);
+	// 	LocalOut.ar(snd);
+	// 	Out.ar(effectBus, snd);
+	// }, [\ir, \ir]).add;
 
 	"---- core synth defs loaded ----".postln;
 

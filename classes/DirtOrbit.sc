@@ -66,11 +66,12 @@ DirtOrbit {
 			GlobalDirtEffect(\dirt_leslie, [\lrate, \lsize], dirt.numChannels, 2*dirt.numChannels),
 			GlobalDirtEffect(\dirt_tape, [\tapefb, \taped, \tapec], dirt.numChannels, 3*dirt.numChannels),
 			GlobalDirtEffect(\dirt_hall, [\hallfb, \hallcutoff, \halltail, \hallpredelay, \halldelay, \halldelayt, \halldelayfb, \hallshift], dirt.numChannels, 4*dirt.numChannels),
-			GlobalDirtEffect(\dirt_ambient, [\amb, \ambfreq, \ambfb, \amblpf, \ambvoice, \ambwidth], dirt.numChannels, 5*dirt.numChannels),
+			//GlobalDirtEffect(\dirt_ambient, [\amb, \ambfreq, \ambfb, \amblpf, \ambvoice, \ambwidth], dirt.numChannels, 5*dirt.numChannels),
 			GlobalDirtEffect(\dirt_rms, [\rmsReplyRate, \rmsPeakLag], dirt.numChannels, 0).alwaysRun_(true),
 			GlobalDirtEffect(\dirt_monitor, [], dirt.numChannels, 0).alwaysRun_(true),
 		];
-		sendpars = [\delay, \room, \leslie, \tape, \hall, \ambsend];
+		sendpars = [\delay, \room, \leslie, \tape, \hall]
+		//sendpars = [\delay, \room, \leslie, \tape, \hall, \ambsend];
 	}
 
 	globalEffects_ { |array|
