@@ -73,7 +73,7 @@ live coding them requires that you have your SuperDirt instance in an environmen
 	}, [\ir, \ir, \ir, \ir, \ir, \ir]).add;
 
 	// need to find a way to not hardcode this!
-	(0..(7-3)).do { |fxindex|
+	(0..(8-3)).do { |fxindex|
 		SynthDef("dirt_gate_fx" ++ fxindex ++ numChannels, { |out, in, fxBus, send,
 			sustain = 1, fadeInTime = 0.001, fadeTime = 0.001, amp = 1|
 			var signal = In.ar(in, numChannels);

@@ -15,6 +15,8 @@ CORE SYNTHDEFS FOR DIRT
 (
 {
 	var numChannels = ~dirt.numChannels;
+	var arena_buffer = Buffer.alloc(~dirt.server, ~dirt.server.sampleRate, numChannels);
+	arena_buffer.sine3(Array.exprand(100,20,8000), Array.rand(100, 0,1), Array.rand(100,-1,1));
 
 
 	/*
@@ -249,6 +251,35 @@ CORE SYNTHDEFS FOR DIRT
 		snd = snd * EnvGen.kr(Env.asr, gate, doneAction:2);
 		Out.ar(effectBus, snd);
 	}, [\ir, \ir]).add;
+
+	SynthDef("dirt_arena" ++ numChannels, { |fxBus, effectBus, gate = 1, arenatime=1.0, arenafb=0, arenacutoff=8000|
+		var in = In.ar(fxBus, numChannels);
+		var ta = Lag.kr(arenatime, 0.2);
+		var fc = Lag.kr(arenacutoff, 0.2);
+		var fb = Lag.kr(arenafb.linlin(0,2,0,0.8), 0.2);
+		var snd = LPF.ar(in, fc);
+
+		snd = fb * LocalIn.ar(numChannels) + snd;
+		//snd = GreyholeRaw.ar(snd[0], snd[1], fc.explin(20,20000,1,0), ta, 0.5, fb, 0, 5, 2.0);
+		snd = JPverbRaw.ar(snd[0], snd[1],
+			damp:fc.explin(20,20e3,1,0),
+			earlydiff:0.8,
+			lowband:500, highband:2000,
+			lowx: 0.707, midx:1, highx:1.5,
+			size:5,
+			t60:ta*5);
+		snd = tanh(snd);
+		//snd = snd**3;
+		snd = BHiShelf.ar(snd, fc, db:-20);
+
+		LocalOut.ar(LeakDC.ar(snd));
+
+		DirtPause.ar(in+snd, graceTime:8);
+		snd = snd * EnvGen.kr(Env.asr, gate, doneAction:2);
+		Out.ar(effectBus, snd);
+	}, [\ir, \ir]).add;
+
+
 
 	// SynthDef("dirt_ambient" ++ numChannels, { |fxBus, effectBus, gate = 1,
 	// 	amb = 0.0, ambfreq=220.0, amblpf=3500, ambfb=0.0 |
