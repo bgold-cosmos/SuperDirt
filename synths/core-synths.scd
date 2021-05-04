@@ -108,7 +108,7 @@ live coding them requires that you have your SuperDirt instance in an environmen
 	// the monitor does the mixing and zeroing of the busses for each sample grain
 	// so that they can all play in one bus
 
-	SynthDef("dirt_gate" ++ numChannels, { |out, in, sustain = 1, fadeInTime = 0.001, fadeTime = 0.001, amp = 1, gain = 1, overgain = 0|
+	SynthDef("dirt_gate" ++ numChannels, { |out, in, dry, sustain = 1, fadeInTime = 0.001, fadeTime = 0.001, amp = 1, gain = 1, overgain = 0|
 		var signal = In.ar(in, numChannels);
 		 //  doneAction: 14: free surrounding group and all nodes
 		var env = EnvGen.ar(Env([0, 1, 1, 0], [fadeInTime, sustain, fadeTime], \sin), doneAction: 14);
@@ -116,10 +116,20 @@ live coding them requires that you have your SuperDirt instance in an environmen
 		signal = signal * env * amp * DirtGateCutGroup.ar(fadeTime, doneAction: 14);
 		// this takes the signal and offsets it so it matches precisely onto the sample
 		// as scheduled within one block (a synth is always started on the block bondary)
-		OffsetOut.ar(out, signal);
+		OffsetOut.ar(out, dry*signal);
 		ReplaceOut.ar(in, Silent.ar(numChannels)) // clears bus signal for subsequent synths
-	}, [\ir, \ir, \ir, \ir, \ir, \kr, \ir, \ir]).add; // amp can be modulated, gain and overgain can't
+	}, [\ir, \ir, \ir, \ir, \ir, \ir, \kr, \ir, \ir]).add; // amp can be modulated, gain and overgain can't
 
+	(0..(8-3)).do { |fxIndex|
+		SynthDef("dirt_gate_fx" ++ fxIndex ++ numChannels, { |out, in, fxBus, send, sustain=1,
+			fadeInTime=0.001, fadeTime=0.001, amp=1, gain=1, overgain=0|
+			var signal = In.ar(in, numChannels);
+			var env = EnvGen.ar(Env([0,1,1,0], [fadeInTime, sustain, fadeTime], \sin), doneAction:2);
+			amp = amp * pow(gain.min(2) + overgain, 4);
+			signal = signal * env * amp * DirtGateCutGroup.ar(fadeTime, doneAction:2);
+			OffsetOut.ar(fxBus + (numChannels * fxIndex), send*signal);
+		}, [\ir, \ir, \ir, \ir, \ir, \ir, \ir, \kr, \ir, \ir]).add;
+	};
 
 	/*
 

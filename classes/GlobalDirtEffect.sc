@@ -13,18 +13,18 @@ sends only OSC when an update is necessary
 
 GlobalDirtEffect {
 
-	var <>name, <>paramNames, <>numChannels, <state;
+	var <>name, <>paramNames, <>numChannels, <>offset, <state;
 	var <>alwaysRun = false;
 	var synth, defName;
 
-	*new { |name, paramNames, numChannels|
-		^super.newCopyArgs(name, paramNames, numChannels, ())
+	*new { |name, paramNames, numChannels, offset|
+		^super.newCopyArgs(name, paramNames, numChannels, offset, ())
 	}
 
-	play { |group, outBus, dryBus, effectBus, orbitIndex|
+	play { |group, outBus, dryBus, effectBus, fxBus, orbitIndex|
 		this.release;
 		synth = Synth.after(group, name.asString ++ numChannels,
-			[\outBus, outBus, \dryBus, dryBus, \effectBus, effectBus, \orbitIndex, orbitIndex] ++ state.asPairs
+			[\outBus, outBus, \dryBus, dryBus, \effectBus, effectBus, \fxBus, fxBus.index+offset, \orbitIndex, orbitIndex] ++ state.asPairs
 		)
 	}
 
@@ -43,10 +43,12 @@ GlobalDirtEffect {
 		var argsChanged, someArgsNotNil = alwaysRun;
 		paramNames.do { |key|
 			var value = event[key];
-			value !? { someArgsNotNil = true };
-			if(state[key] != value) {
-				argsChanged = argsChanged.add(key).add(value);
-				state[key] = value;
+			if (value != nil) {
+				someArgsNotNil = true;
+				if(state[key] != value) {
+					argsChanged = argsChanged.add(key).add(value);
+					state[key] = value;
+				}
 			}
 		};
 		if(someArgsNotNil) { this.resume };
