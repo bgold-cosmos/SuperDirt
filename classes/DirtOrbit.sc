@@ -27,7 +27,6 @@ DirtOrbit {
 	var <server;
 	var <synthBus, <globalEffectBus, <dryBus, <fxBus;
 	var <group, <globalEffects, <cutGroups;
-	var <sendpars;
 	var <>minSustain;
 
 
@@ -61,16 +60,15 @@ DirtOrbit {
 	initDefaultGlobalEffects {
 		this.globalEffects = [
 			// all global effects sleep when the input is quiet for long enough and no parameters are set.
-			GlobalDirtEffect(\dirt_delay, [\delaytime, \delayfeedback, \lock, \cps], dirt.numChannels, 0*dirt.numChannels),
-			GlobalDirtEffect(\dirt_reverb, [\size], dirt.numChannels, 1*dirt.numChannels),
-			GlobalDirtEffect(\dirt_leslie, [\lrate, \lsize], dirt.numChannels, 2*dirt.numChannels),
-			GlobalDirtEffect(\dirt_hall, [\hallfb, \hallcutoff, \halltail, \hallpredelay, \halldelay, \halldelayt, \halldelayfb, \hallshift], dirt.numChannels, 3*dirt.numChannels),
-			GlobalDirtEffect(\dirt_tape, [\tapefb, \taped, \tapec], dirt.numChannels, 4*dirt.numChannels),
-			GlobalDirtEffect(\dirt_arena, [\arenafb, \arenacutoff, \arenatime], dirt.numChannels, 5*dirt.numChannels),
-			GlobalDirtEffect(\dirt_rms, [\rmsReplyRate, \rmsPeakLag], dirt.numChannels, 0).alwaysRun_(true),
-			GlobalDirtEffect(\dirt_monitor, [\limitertype], dirt.numChannels, 0).alwaysRun_(true),
+			GlobalDirtEffect(\dirt_delay, [\delaytime, \delayfeedback, \lock, \cps]),
+			GlobalDirtEffect(\dirt_reverb, [\size]),
+			GlobalDirtEffect(\dirt_leslie, [\lrate, \lsize]),
+			GlobalDirtEffect(\dirt_hall, [\hallfb, \hallcutoff, \halltail, \hallpredelay, \halldelay, \halldelayt, \halldelayfb, \hallshift]),
+			GlobalDirtEffect(\dirt_tape, [\tapefb, \taped, \tapec]),
+			GlobalDirtEffect(\dirt_arena, [\arenafb, \arenacutoff, \arenatime]),
+			GlobalDirtEffect(\dirt_rms, [\rmsReplyRate, \rmsPeakLag]).alwaysRun_(true),
+			GlobalDirtEffect(\dirt_monitor, [\limitertype]).alwaysRun_(true),
 		];
-		sendpars = [\delay, \room, \leslie, \hall, \tape, \arena];
 	}
 
 	globalEffects_ { |array|

@@ -13,18 +13,18 @@ sends only OSC when an update is necessary
 
 GlobalDirtEffect {
 
-	var <>name, <>paramNames, <>numChannels, <>offset, <state;
+	var <>name, <>paramNames, <>numChannels, <state, <>fxIndex;
 	var <>alwaysRun = false;
 	var synth, defName;
 
-	*new { |name, paramNames, numChannels, offset|
-		^super.newCopyArgs(name, paramNames, numChannels, offset, ())
+	*new { |name, paramNames, numChannels|
+		^super.newCopyArgs(name, paramNames, numChannels, ())
 	}
 
 	play { |group, outBus, dryBus, effectBus, fxBus, orbitIndex|
 		this.release;
 		synth = Synth.after(group, name.asString ++ numChannels,
-			[\outBus, outBus, \dryBus, dryBus, \effectBus, effectBus, \fxBus, fxBus.index+offset, \orbitIndex, orbitIndex] ++ state.asPairs
+			[\outBus, outBus, \dryBus, dryBus, \effectBus, effectBus, \fxBus, fxBus, \orbitIndex, orbitIndex] ++ state.asPairs
 		)
 	}
 

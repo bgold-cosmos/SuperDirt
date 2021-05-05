@@ -143,28 +143,6 @@ DirtEvent {
 	}
 
 	sendGateSynth {
-		(0..(orbit.globalEffects.size-3)).do {|fxIndex|
-			server.sendMsg(\s_new,
-				"dirt_gate_fx" ++ fxIndex ++ ~numChannels,
-				-1, // no id
-				1, // add action: addToTail
-				~synthgroup, // send to group
-				*[
-					in: orbit.synthBus.index, // read from synth bus, which is reused
-					out: orbit.dryBus.index, // write to orbital dry bus
-					fxBus: orbit.fxBus.index,
-					dry: ~dry,
-					send: currentEnvironment.at(orbit.sendpars[fxIndex]),
-					amp: ~amp,
-					gain: ~gain,
-					overgain: ~overgain,
-					sample: ~hash, // required for the cutgroup mechanism
-					sustain: ~sustain, // after sustain, free all synths and group
-					fadeInTime: ~fadeInTime, // fade in
-					fadeTime: ~fadeTime // fade out
-				]
-			);
-		};
 		server.sendMsg(\s_new,
 			"dirt_gate" ++ ~numChannels,
 			-1, // no id
@@ -174,6 +152,12 @@ DirtEvent {
 				in: orbit.synthBus.index, // read from synth bus, which is reused
 				out: orbit.dryBus.index, // write to orbital dry bus
 				fxBus: orbit.fxBus.index,
+				delay: ~delay,
+				room: ~room,
+				leslie: ~leslie,
+				hall: ~hall,
+				tape: ~tape,
+				arena: ~arena,
 				dry: ~dry,
 				amp: ~amp,
 				gain: ~gain,
