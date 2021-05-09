@@ -16,8 +16,9 @@ CORE SYNTHDEFS FOR DIRT
 {
 	var numChannels = ~dirt.numChannels;
 	var arenaBuffer = Buffer.alloc(~dirt.server, ~dirt.server.sampleRate, numChannels);
-	arenaBuffer.sine3(Array.exprand(100,20,8000), Array.rand(100,0,1), Array.rand(100,-1,1));
+	var offsetDict = Dictionary.newFrom([\delay, 0, \room, 1, \leslie, 2, \hall, 3, \tape, 4, \arena, 5]);
 
+	arenaBuffer.sine3(Array.exprand(100,20,8000), Array.rand(100,0,1), Array.rand(100,-1,1));
 
 	/*
 
@@ -80,7 +81,7 @@ CORE SYNTHDEFS FOR DIRT
 
 		SynthDef("dirt_delay" ++ numChannels, { |fxBus, effectBus, gate = 1, delaytime, delayfeedback, lock = 0, cps = 1|
 			var signal;
-			var input = In.ar(fxBus, numChannels);
+			var input = In.ar(fxBus+(offsetDict[\delay]*numChannels), numChannels);
 			var maxDelayTime = 4;
 
 			delayfeedback = delayfeedback.max(0);
@@ -105,7 +106,7 @@ CORE SYNTHDEFS FOR DIRT
 		"Note that we are using a comb delay, which may not sound the same as SwitchDelay from the plugins".postln;
 
 		SynthDef("dirt_delay" ++ numChannels, { |fxBus, effectBus, gate = 1, delaytime, delayfeedback, lock = 0, cps = 1|
-			var signal = In.ar(fxBus, numChannels);
+			var signal = In.ar(fxBus+(offsetDict[\delay]*numChannels), numChannels);
 			var maxDelayTime = 4;
 			var decayTime;
 
@@ -132,7 +133,7 @@ CORE SYNTHDEFS FOR DIRT
 	SynthDef("dirt_reverb" ++ numChannels, { |fxBus, effectBus, gate = 1, size = 0.1|
 		var in, snd, loop, depth;
 
-		in = In.ar(fxBus+(1*numChannels), numChannels).asArray.sum;
+		in = In.ar(fxBus+(offsetDict[\room]*numChannels), numChannels).asArray.sum;
 
 		4.do { in = AllpassN.ar(in, 0.03, { Rand(0.005, 0.02) }.dup(numChannels), 1) };
 
@@ -168,7 +169,7 @@ CORE SYNTHDEFS FOR DIRT
 	SynthDef("dirt_leslie" ++ numChannels, { |fxBus, effectBus, gate = 1, lrate=6.7, lsize=0.3|
 		var in, distance, throb, sound1, sound2, bal1, bal2, snd;
 
-		in = In.ar(fxBus+(2*numChannels), numChannels);
+		in = In.ar(fxBus+(offsetDict[\leslie]*numChannels), numChannels);
 
 		in = if(numChannels > 2) { in.clump(2).sum } { in.dup };
 		distance = SinOsc.ar(Lag.kr(lrate,10), 0).range(0, lsize);
@@ -205,7 +206,7 @@ CORE SYNTHDEFS FOR DIRT
 	}, [\ir, \ir]).add;
 
 	SynthDef("dirt_tape" ++ numChannels, { |fxBus, effectBus, gate=1, taped, tapefb, tapec|
-		var in = In.ar(fxBus+(4*numChannels), numChannels);
+		var in = In.ar(fxBus+(offsetDict[\tape]*numChannels), numChannels);
 		var maxDelayTime = 8;
 		var decayTime, delay, delayfb, loop;
 
@@ -226,7 +227,7 @@ CORE SYNTHDEFS FOR DIRT
 
 	SynthDef("dirt_hall" ++ numChannels, { |fxBus, effectBus, gate=1,
 		hallfb=0.2, hallcutoff=3500, halltail=1, hallpredelay=0, halldelay=0, halldelayt=1, halldelayfb=0.5, hallshift = (-2)|
-		var in = In.ar(fxBus+(3*numChannels), numChannels);
+		var in = In.ar(fxBus+(offsetDict[\hall]*numChannels), numChannels);
 		var snd;
 		var a1d = 337 / 44100;
 		var a2d = 113 / 44100;
@@ -261,7 +262,7 @@ CORE SYNTHDEFS FOR DIRT
 	}, [\ir, \ir]).add;
 
 	SynthDef("dirt_arena" ++ numChannels, { |fxBus, effectBus, gate=1, arenatime=1, arenafb=0, arenacutoff=8000|
-		var in = In.ar(fxBus+(5*numChannels), numChannels);
+		var in = In.ar(fxBus+(offsetDict[\arena]*numChannels), numChannels);
 		var ta = Lag.kr(arenatime, 0.2);
 		var fc = Lag.kr(arenacutoff, 0.2);
 		var fb = Lag.kr(arenafb.linlin(0,2,0,0.8), 0.2);
