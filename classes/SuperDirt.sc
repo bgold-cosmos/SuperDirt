@@ -146,6 +146,14 @@ SuperDirt {
 		soundLibrary.postSampleInfo
 	}
 
+	doNotReadYet_ { |bool|
+		soundLibrary.doNotReadYet_(bool)
+	}
+
+	doNotReadYet {
+		^soundLibrary.doNotReadYet
+	}
+
 	verbose_ { |bool|
 		soundLibrary.verbose_(bool)
 	}
@@ -284,14 +292,21 @@ SuperDirt {
 			}
 		};
 
+		netResponders.add(
+			OSCFunc({ |msg, time, tidalAddr|
+				var name = msg[1].asSymbol;
+				var synth = SynthDescLib.global.at(name);
+				var controls = synth.controls;
+				var controlNames = msg[1];
+				controls.do{|control| controlNames = controlNames ++ " " ++ control.name};
+				tidalAddr.sendMsg("/dirt/synth-info/reply", controlNames);
+			}, "/dirt/synth-info", senderAddr, recvPort: port).fix
+		);
 
 		netResponders.add(
-
 			OSCFunc({ |msg, time, tidalAddr|
-				if(replyAddr.isNil) {
-					replyAddr = tidalAddr; // collect tidal reply address
-					replyAddr.sendMsg("/dirt/hello/reply");
-				};
+				replyAddr = tidalAddr; // collect tidal reply address
+				replyAddr.sendMsg("/dirt/hello/reply");
 			}, "/dirt/hello", senderAddr, recvPort: port).fix
 		);
 
